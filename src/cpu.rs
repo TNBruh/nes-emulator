@@ -1,8 +1,8 @@
-use std::default;
 
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
+    pub register_y: u8,
     pub status: u8,
     pub program_counter: u16,
     memory: [u8; 0xFFFF]
@@ -13,9 +13,48 @@ impl CPU {
         CPU { 
             register_a: 0, 
             register_x: 0,
+            register_y: 0,
             status: 0, 
             program_counter: 0,
             memory: [0; 0xFFFF],
+        }
+    }
+
+    fn get_operand_address(&self, mode: &AddressingMode) -> u16 {
+        match mode {
+            AddressingMode::Immediate => self.program_counter,
+            AddressingMode::ZeroPage => self.mem_read(self.program_counter) as u16,
+            AddressingMode::Absolute => self.mem_read_u16(self.program_counter),
+            AddressingMode::ZeroPage_X => self.mem_read(self.program_counter).wrapping_add(self.register_x) as u16,
+            AddressingMode::ZeroPage_Y => self.mem_read(self.program_counter).wrapping_add(self.register_y) as u16,
+            AddressingMode::Absolute_X => self.mem_read_u16(self.program_counter).wrapping_add(self.register_x as u16),
+            AddressingMode::Absolute_Y => self.mem_read_u16(self.program_counter).wrapping_add(self.register_y as u16),
+            AddressingMode::Indirect_X => {
+                let ptr: u8 = self.mem_read(self.program_counter).wrapping_add(self.register_x);
+                (
+                    self.mem_read(
+                        ptr.wrapping_add(1) as u16
+                    ) as u16
+                ) << 8 | 
+                (
+                    self.mem_read(ptr as u16)
+                ) as u16
+            },
+            AddressingMode::Indirect_Y => {
+                let ptr: u8 = self.mem_read(self.program_counter).wrapping_add(self.register_y);
+                (
+                    self.mem_read(
+                        ptr.wrapping_add(1) as u16
+                    ) as u16
+                ) << 8 | 
+                (
+                    self.mem_read(ptr as u16)
+                ) as u16
+            },
+            AddressingMode::NonAddressing => {
+                panic!("mode {:?} is not supported", mode);
+            }
+
         }
     }
 
@@ -43,6 +82,7 @@ impl CPU {
     pub fn reset(&mut self) {
         self.register_a = 0;
         self.register_x = 0;
+        self.register_y = 0;
         self.status = 0;
 
         self.program_counter = self.mem_read_u16(0xFFFC);
@@ -70,6 +110,11 @@ impl CPU {
                     self.program_counter += 1;
                     self.lda(param)
                 },
+                0xA2 => {
+                    let param = self.mem_read(self.program_counter);
+                    self.program_counter += 1;
+                    self.ldx(param)
+                },
                 0xAA => self.tax(),
                 0xE8 => self.inx(),
                 0x00 => return,
@@ -81,6 +126,11 @@ impl CPU {
     fn lda(&mut self, value: u8) {
         self.register_a = value;
         self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn ldx(&mut self, value: u8) {
+        self.register_x = value;
+        self.update_zero_and_negative_flags(self.register_x);
     }
 
     fn tax(&mut self) {
@@ -106,4 +156,19 @@ impl CPU {
             self.status &= 0b0000_0010;
         }
     }
+}
+
+#[derive(Debug)]
+#[allow(non_camel_case_types)]
+pub enum AddressingMode {
+    Immediate,
+    ZeroPage,
+    ZeroPage_X,
+    ZeroPage_Y,
+    Absolute,
+    Absolute_X,
+    Absolute_Y,
+    Indirect_X,
+    Indirect_Y,
+    NonAddressing
 }
