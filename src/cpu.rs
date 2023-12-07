@@ -106,14 +106,20 @@ impl CPU {
 
             match opscode {
                 0xA9 => {
-                    let param = self.mem_read(self.program_counter);
+                    // RM: chapter 3 p 2
+                    // let param = self.mem_read(self.program_counter);
+                    // self.program_counter += 1;
+                    // self.lda(param)
+                    self.lda(&AddressingMode::Immediate);
                     self.program_counter += 1;
-                    self.lda(param)
                 },
                 0xA2 => {
-                    let param = self.mem_read(self.program_counter);
+                    // RM: chapter 3 p 2
+                    // let param = self.mem_read(self.program_counter);
+                    // self.program_counter += 1;
+                    // self.ldx(param)
+                    self.ldx(&AddressingMode::Immediate);
                     self.program_counter += 1;
-                    self.ldx(param)
                 },
                 0xAA => self.tax(),
                 0xE8 => self.inx(),
@@ -123,15 +129,31 @@ impl CPU {
         }
     }
 
-    fn lda(&mut self, value: u8) {
-        self.register_a = value;
-        self.update_zero_and_negative_flags(self.register_a);
+    // fn lda(&mut self, value: u8) {
+    //     self.register_a = value;
+    //     self.update_zero_and_negative_flags(self.register_a);
+    // }
+    // fn ldx(&mut self, value: u8) {
+    //     self.register_x = value;
+    //     self.update_zero_and_negative_flags(self.register_x);
+    // }
+    fn lda(&mut self, mode: &AddressingMode) {
+        self.register_a = self.mem_read(
+            self.get_operand_address(mode)
+        );
+
+        self.update_zero_and_negative_flags(self.register_a)
     }
 
-    fn ldx(&mut self, value: u8) {
-        self.register_x = value;
-        self.update_zero_and_negative_flags(self.register_x);
+    fn ldx(&mut self, mode: &AddressingMode) {
+        self.register_x = self.mem_read(
+            self.get_operand_address(mode)
+        );
+
+        self.update_zero_and_negative_flags(self.register_x)
     }
+
+    
 
     fn tax(&mut self) {
         self.register_x = self.register_a;
