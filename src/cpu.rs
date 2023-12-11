@@ -105,146 +105,43 @@ impl CPU {
             self.program_counter += 1;
 
             match opscode {
-                // LDA
-                0xA9 => {
-                    // RM: chapter 3 p 2
-                    // let param = self.mem_read(self.program_counter);
-                    // self.program_counter += 1;
-                    // self.lda(param)
-                    self.lda(&AddressingMode::Immediate);
-                    self.program_counter += 1;
-                },
-                0xA5 => {
-                    self.lda(&AddressingMode::ZeroPage);
-                    self.program_counter += 1;
-                },
-                0xB5 => {
-                    self.lda(&AddressingMode::ZeroPage_X);
-                    self.program_counter += 1;
-                },
-                0xAD => {
-                    self.lda(&AddressingMode::Absolute);
-                    self.program_counter += 2;
-                },
-                0xBD => {
-                    self.lda(&AddressingMode::Absolute_X);
-                    self.program_counter += 2;
-                },
-                0xB9 => {
-                    self.lda(&AddressingMode::Absolute_Y);
-                    self.program_counter += 2;
-                },
-                0xA1 => {
-                    self.lda(&AddressingMode::Indirect_X);
-                    self.program_counter += 1;
-                },
-                0xB1 => {
-                    self.lda(&AddressingMode::Indirect_Y);
-                    self.program_counter += 1;
-                },
-                // LDA END
-                // LDX
-                0xA2 => {
-                    // RM: chapter 3 p 2
-                    // let param = self.mem_read(self.program_counter);
-                    // self.program_counter += 1;
-                    // self.ldx(param)
-                    self.ldx(&AddressingMode::Immediate);
-                    self.program_counter += 1;
-                },
-                0xA6 => {
-                    self.ldx(&AddressingMode::ZeroPage);
-                    self.program_counter += 1;
-                },
-                0xB6 => {
-                    self.ldx(&AddressingMode::ZeroPage_Y);
-                    self.program_counter += 1;
-                },
-                0xAE => {
-                    self.ldx(&AddressingMode::Absolute);
-                    self.program_counter += 2;
-                },
-                0xBE => {
-                    self.ldx(&AddressingMode::Absolute_Y);
-                    self.program_counter += 2;
-                },
-                // LDX END
-                // STA
-                0x85 => {
-                    self.sta(&AddressingMode::ZeroPage);
-                    self.program_counter += 1;
-                },
-                0x95 => {
-                    self.sta(&AddressingMode::ZeroPage_X);
-                    self.program_counter += 1;
-                },
-                0x8D => {
-                    self.sta(&AddressingMode::Absolute);
-                    self.program_counter += 2;
-                },
-                0x9D => {
-                    self.sta(&AddressingMode::Absolute_X);
-                    self.program_counter += 2;
-                },
-                0x99 => {
-                    self.sta(&AddressingMode::Absolute_Y);
-                    self.program_counter += 2;
-                },
-                0x81 => {
-                    self.sta(&AddressingMode::Indirect_X);
-                    self.program_counter += 1;
-                },
-                0x91 => {
-                    self.sta(&AddressingMode::Indirect_Y);
-                    self.program_counter += 1;
-                }
-                // STA END
-                0xAA => self.tax(),
-                0xE8 => self.inx(),
-                0x00 => return,
                 _ => todo!("AMOGUS")
             }
         }
     }
 
-    // fn lda(&mut self, value: u8) {
-    //     self.register_a = value;
-    //     self.update_zero_and_negative_flags(self.register_a);
+    /* RM: C 3 P 2
+    // fn lda(&mut self, mode: &AddressingMode) {
+    //     self.register_a = self.mem_read(
+    //         self.get_operand_address(mode)
+    //     );
+
+    //     self.update_zero_and_negative_flags(self.register_a)
     // }
-    // fn ldx(&mut self, value: u8) {
-    //     self.register_x = value;
+
+    // fn ldx(&mut self, mode: &AddressingMode) {
+    //     self.register_x = self.mem_read(
+    //         self.get_operand_address(mode)
+    //     );
+
+    //     self.update_zero_and_negative_flags(self.register_x)
+    // }
+
+    // fn sta(&mut self, mode: &AddressingMode) {
+    //     let addr = self.get_operand_address(mode);
+    //     self.mem_write(addr, self.register_a)
+    // }
+
+    // fn tax(&mut self) {
+    //     self.register_x = self.register_a;
     //     self.update_zero_and_negative_flags(self.register_x);
     // }
-    fn lda(&mut self, mode: &AddressingMode) {
-        self.register_a = self.mem_read(
-            self.get_operand_address(mode)
-        );
 
-        self.update_zero_and_negative_flags(self.register_a)
-    }
-
-    fn ldx(&mut self, mode: &AddressingMode) {
-        self.register_x = self.mem_read(
-            self.get_operand_address(mode)
-        );
-
-        self.update_zero_and_negative_flags(self.register_x)
-    }
-
-    fn sta(&mut self, mode: &AddressingMode) {
-        let addr = self.get_operand_address(mode);
-        self.mem_write(addr, self.register_a)
-    }
-
-    fn tax(&mut self) {
-        self.register_x = self.register_a;
-        self.update_zero_and_negative_flags(self.register_x);
-    }
-
-    fn inx(&mut self) {
-        (self.register_x, _) = self.register_x.overflowing_add(1);
-        self.update_zero_and_negative_flags(self.register_x);
-    }
+    // fn inx(&mut self) {
+    //     (self.register_x, _) = self.register_x.overflowing_add(1);
+    //     self.update_zero_and_negative_flags(self.register_x);
+    // }
+    */
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 { // if zero
