@@ -201,12 +201,9 @@ lazy_static!{
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
-        for i in OPCODES.iter() {
-            map.insert(
-                i.byte,
-                &i 
-            );
-        }  
+        OPCODES.iter().for_each(|x| {
+            map.insert(x.byte, x);
+        });
         map
     };
 }
