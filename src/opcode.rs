@@ -1,5 +1,6 @@
 use crate::cpu::AddressingMode;
 
+#[derive(Debug, Clone, Copy)]
 pub struct OpCode {
     pub byte: u8, // mnemonic in byte form (i think it's called "mnemonic")
     pub name: &'static str, // the literal name

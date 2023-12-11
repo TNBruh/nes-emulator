@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use lazy_static::lazy_static;
 use opcode::OpCode;
 use cpu::AddressingMode;
@@ -197,6 +199,16 @@ lazy_static!{
         
         
     ];
+    pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
+        let mut map: HashMap<u8, &OpCode> = HashMap::new();
+        for i in OPCODES.iter() {
+            map.insert(
+                i.byte,
+                &i 
+            );
+        }  
+        map
+    };
 }
 
 fn main() {

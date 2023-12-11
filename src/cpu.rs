@@ -1,3 +1,5 @@
+use crate::{OPCODES_MAP, opcode::OpCode};
+
 
 pub struct CPU {
     pub register_a: u8,
@@ -104,10 +106,46 @@ impl CPU {
             let opscode = self.mem_read(self.program_counter);
             self.program_counter += 1;
 
-            match opscode {
+            //saving the state for some reason?
+            let temp_program_counter = self.program_counter;
+
+            //coerced (i think that's the word): &&OpCode -> &OpCode
+            let entry: &OpCode = OPCODES_MAP.get(&opscode).expect("WHERE IS MY SUPER SUIT?"); 
+
+            match entry.name {
+                "LDA" => self.lda(entry),
+                "LDX" => self.ldx(entry),
+                "STA" => self.sta(entry),
+                "TAX" => self.tax(entry),
+                "INX" => self.inx(entry),
                 _ => todo!("AMOGUS")
             }
+
+            // idk why we do this. maybe it will be explained later
+            if self.program_counter == temp_program_counter {
+                self.program_counter += (entry.len - 1) as u16;
+            }
         }
+    }
+
+    fn lda(&mut self, op: &OpCode) {
+
+    }
+
+    fn ldx(&mut self, op: &OpCode) {
+
+    }
+
+    fn sta(&mut self, op: &OpCode) {
+
+    }
+
+    fn tax(&mut self, op: &OpCode) {
+
+    }
+
+    fn inx(&mut self, op: &OpCode) {
+
     }
 
     /* RM: C 3 P 2
@@ -158,7 +196,7 @@ impl CPU {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[allow(non_camel_case_types)]
 pub enum AddressingMode {
     Immediate,
