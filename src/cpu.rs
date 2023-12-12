@@ -72,7 +72,7 @@ impl CPU {
         self.memory[addr as usize] = data
     }
 
-    fn mem_read_u16(&self, addr: u16) -> u16 {
+    fn mem_read_u16(&self, addr: u16) -> u16 { // returns little endian
         u16::from_be_bytes([
             self.mem_read(addr+1),
             self.mem_read(addr)
@@ -129,6 +129,7 @@ impl CPU {
             }
 
             // idk why we do this. maybe it will be explained later
+            // ANSWER: it's not explained. but JSR is one of the reason
             if self.program_counter == temp_program_counter {
                 self.program_counter += (entry.len - 1) as u16;
             }
@@ -172,13 +173,39 @@ impl CPU {
     }
 
     fn pha(&mut self) {
-        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, self.register_a);
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.push(self.register_a);
     }
 
     fn php(&mut self) { // i'm supposed to do something about the break flag? yet the wiki only says to push the status reg. oh well
-        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, self.status);
+        self.push(self.status);
+    }
+
+    fn jsr(&mut self, op: &OpCode) {
+        let jmp_addr = self.get_operand_address(&op.mode);
+        let rtn_addr = (self.program_counter + 1).to_ne_bytes();
+        self.push(rtn_addr[0]);
+        self.push(rtn_addr[1]);
+
+        self.program_counter = jmp_addr;
+    }
+
+    fn rts(&mut self) {
+        self.program_counter = u16::from_le_bytes([
+            self.pop(),
+            self.pop()
+        ]).wrapping_add(1);
+    }
+
+    fn push(&mut self, data: u8) {
+        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, data);
         self.stack_pointer = self.stack_pointer.wrapping_add(1);
+    }
+
+    fn pop(&mut self) -> u8 {
+        let data = self.mem_read(STACK_ORIGIN - self.stack_pointer as u16);
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
+
+        data
     }
 
     /* RM: C 3 P 2
