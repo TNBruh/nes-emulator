@@ -58,7 +58,7 @@ impl CPU {
                 ) as u16
             },
             AddressingMode::NonAddressing => {
-                panic!("mode {:?} is not supported", mode);
+                panic!("Caught you tweaking with {:?}.", mode);
             }
 
         }
@@ -118,13 +118,23 @@ impl CPU {
             let entry: &OpCode = OPCODES_MAP.get(&opscode).expect("WHERE IS MY SUPER SUIT?"); 
 
             match entry.name {
+                /*
+                remember to:
+                1. update OpCodeName
+                2. update the OPCODES hashmap
+                3. double check the corresponding byte
+                 */
                 OpCodeName::LDA => self.lda(entry),
                 OpCodeName::LDX => self.ldx(entry),
                 OpCodeName::STA => self.sta(entry),
                 OpCodeName::TAX => self.tax(),
                 OpCodeName::INX => self.inx(),
+                OpCodeName::PHA => self.pha(),
+                OpCodeName::PHP => self.php(),
+                OpCodeName::JSR => self.jsr(entry),
+                OpCodeName::RTS => self.rts(),
                 OpCodeName::BRK => break, // todo: update this
-                #[allow(unreachable_patterns)]
+                // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
             }
 
@@ -202,10 +212,8 @@ impl CPU {
     }
 
     fn pop(&mut self) -> u8 {
-        let data = self.mem_read(STACK_ORIGIN - self.stack_pointer as u16);
         self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-
-        data
+        self.mem_read(STACK_ORIGIN - self.stack_pointer as u16)
     }
 
     /* RM: C 3 P 2

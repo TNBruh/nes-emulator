@@ -45,6 +45,10 @@ lazy_static!{
         OpCode { byte:0xAA, name:OpCodeName::TAX, len:1, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0xE8, name:OpCodeName::INX, len:1, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0x00, name:OpCodeName::BRK, len:1, cycles:7, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x48, name:OpCodeName::PHA, len:1, cycles:3, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x08, name:OpCodeName::PHP, len:1, cycles:3, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x20, name:OpCodeName::JSR, len:3, cycles:6, mode:AddressingMode::Absolute },
+        OpCode { byte:0x60, name:OpCodeName::RTS, len:1, cycles:6, mode:AddressingMode::NonAddressing },
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
@@ -129,6 +133,15 @@ mod test {
         let data = cpu.mem_read(0x10);
         assert_eq!(data, 0x05);
     }
+
+    //test pha
+    
+
+    //test php
+
+    //test jsr
+
+    //test rts
 }
 // #[cfg(test)]
 // mod test {

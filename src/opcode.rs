@@ -13,6 +13,6 @@ pub struct OpCode {
 #[derive(Debug, Clone, Copy)]
 pub enum OpCodeName {
     LDA, LDX, STA, TAX, INX,
-    BRK,
+    BRK, PHA, PHP, JSR, RTS,
 }
 
