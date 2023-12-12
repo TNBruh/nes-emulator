@@ -1,11 +1,14 @@
 use crate::{OPCODES_MAP, opcode::{OpCode, OpCodeName}};
 
+const STACK_ORIGIN: u16 = 0x01FF; // stack grows down and ends at 0x100. overflow will cause it to wrap back
+const STACK: u8 = 0x0; // use this to reset stack. the previous one is just a ref point
 
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
     pub register_y: u8,
     pub status: u8,
+    pub stack_pointer: u8,
     pub program_counter: u16,
     memory: [u8; 0xFFFF]
 }
@@ -17,6 +20,7 @@ impl CPU {
             register_x: 0,
             register_y: 0,
             status: 0, 
+            stack_pointer: STACK,
             program_counter: 0,
             memory: [0; 0xFFFF],
         }
@@ -86,6 +90,7 @@ impl CPU {
         self.register_x = 0;
         self.register_y = 0;
         self.status = 0;
+        self.stack_pointer = STACK;
 
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
@@ -118,7 +123,7 @@ impl CPU {
                 OpCodeName::STA => self.sta(entry),
                 OpCodeName::TAX => self.tax(),
                 OpCodeName::INX => self.inx(),
-                OpCodeName::BRK => break,
+                OpCodeName::BRK => break, // todo: update this
                 #[allow(unreachable_patterns)]
                 _ => todo!("AMOGUS")
             }
@@ -164,6 +169,16 @@ impl CPU {
         (self.register_x, _) = self.register_x.overflowing_add(1);
 
         self.update_zero_and_negative_flags(self.register_x);
+    }
+
+    fn pha(&mut self) {
+        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, self.register_a);
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+    }
+
+    fn php(&mut self) { // i'm supposed to do something about the break flag? yet the wiki only says to push the status reg. oh well
+        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, self.status);
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
     }
 
     /* RM: C 3 P 2
