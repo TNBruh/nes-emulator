@@ -4,6 +4,8 @@ use lazy_static::lazy_static;
 use opcode::OpCode;
 use cpu::AddressingMode;
 
+use crate::opcode::OpCodeName;
+
 pub mod cpu;
 pub mod opcode;
 
@@ -20,180 +22,29 @@ pub mod opcode;
 
 lazy_static!{
     pub static ref OPCODES: Vec<OpCode> = vec![
-        // LDA
-        OpCode {
-            byte: 0xA9,
-            name: "LDA",
-            len: 2,
-            cycles: 2,
-            mode: AddressingMode::Immediate,
-        },
-        OpCode {
-            byte: 0xA5,
-            name: "LDA",
-            len: 2,
-            cycles: 3,
-            mode: AddressingMode::ZeroPage,
-        },
-        OpCode {
-            byte: 0xB5,
-            name: "LDA",
-            len: 2,
-            cycles: 4,
-            mode: AddressingMode::ZeroPage_X,
-        },
-        OpCode {
-            byte: 0xAD,
-            name: "LDA",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute,
-        },
-        OpCode {
-            byte: 0xBD,
-            name: "LDA",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute_X,
-        },
-        OpCode {
-            byte: 0xB9,
-            name: "LDA",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute_Y,
-        },
-        OpCode {
-            byte: 0xA1,
-            name: "LDA",
-            len: 2,
-            cycles: 6,
-            mode: AddressingMode::Indirect_X,
-        },
-        OpCode {
-            byte: 0xB1,
-            name: "LDA",
-            len: 2,
-            cycles: 5,
-            mode: AddressingMode::Indirect_Y,
-        },
-        // LDA END
-        // LDX
-        OpCode {
-            byte: 0xA2,
-            name: "LDX",
-            len: 2,
-            cycles: 2,
-            mode: AddressingMode::Immediate,
-        },
-        OpCode {
-            byte: 0xA6,
-            name: "LDX",
-            len: 2,
-            cycles: 3,
-            mode: AddressingMode::ZeroPage,
-        },
-        OpCode {
-            byte: 0xB6,
-            name: "LDX",
-            len: 2,
-            cycles: 4,
-            mode: AddressingMode::ZeroPage_Y,
-        },
-        OpCode {
-            byte: 0xAE,
-            name: "LDX",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute,
-        },
-        OpCode {
-            byte: 0xBE,
-            name: "LDX",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute_Y,
-        },
-        // LDX END
-        // STA
-        OpCode {
-            byte: 0x85,
-            name: "STA",
-            len: 2,
-            cycles: 3,
-            mode: AddressingMode::ZeroPage,
-        },
-        OpCode {
-            byte: 0x95,
-            name: "STA",
-            len: 2,
-            cycles: 4,
-            mode: AddressingMode::ZeroPage_X,
-        },
-        OpCode {
-            byte: 0x8D,
-            name: "STA",
-            len: 3,
-            cycles: 4,
-            mode: AddressingMode::Absolute,
-        },
-        OpCode {
-            byte: 0x9D,
-            name: "STA",
-            len: 3,
-            cycles: 5,
-            mode: AddressingMode::Absolute_X,
-        },
-        OpCode {
-            byte: 0x99,
-            name: "STA",
-            len: 3,
-            cycles: 5,
-            mode: AddressingMode::Absolute_Y,
-        },
-        OpCode {
-            byte: 0x81,
-            name: "STA",
-            len: 2,
-            cycles: 6,
-            mode: AddressingMode::Indirect_X,
-        },
-        OpCode {
-            byte: 0x91,
-            name: "STA",
-            len: 2,
-            cycles: 6,
-            mode: AddressingMode::Indirect_Y,
-        },
-        // STA END
-        // TAX
-        OpCode {
-            byte: 0xAA,
-            name: "TAX",
-            len: 1,
-            cycles: 2,
-            mode: AddressingMode::NonAddressing,
-        },
-        // TAX END
-        // INX
-        OpCode {
-            byte: 0xE8,
-            name: "INX",
-            len: 1,
-            cycles: 2,
-            mode: AddressingMode::NonAddressing,
-        },
-        // INX END
-        // BRK
-        OpCode {
-            byte: 0x00,
-            name: "BRK",
-            len: 1,
-            cycles: 7,
-            mode: AddressingMode::NonAddressing,
-        },
-        // BRK END
-        
+        OpCode { byte:0xA9, name:OpCodeName::LDA, len:2, cycles:2, mode:AddressingMode::Immediate },
+        OpCode { byte:0xA5, name:OpCodeName::LDA, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0xB5, name:OpCodeName::LDA, len:2, cycles:4, mode:AddressingMode::ZeroPage_X },
+        OpCode { byte:0xAD, name:OpCodeName::LDA, len:3, cycles:4, mode:AddressingMode::Absolute },
+        OpCode { byte:0xBD, name:OpCodeName::LDA, len:3, cycles:4, mode:AddressingMode::Absolute_X },
+        OpCode { byte:0xB9, name:OpCodeName::LDA, len:3, cycles:4, mode:AddressingMode::Absolute_Y },
+        OpCode { byte:0xA1, name:OpCodeName::LDA, len:2, cycles:6, mode:AddressingMode::Indirect_X },
+        OpCode { byte:0xB1, name:OpCodeName::LDA, len:2, cycles:5, mode:AddressingMode::Indirect_Y },
+        OpCode { byte:0xA2, name:OpCodeName::LDX, len:2, cycles:2, mode:AddressingMode::Immediate },
+        OpCode { byte:0xA6, name:OpCodeName::LDX, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0xB6, name:OpCodeName::LDX, len:2, cycles:4, mode:AddressingMode::ZeroPage_Y },
+        OpCode { byte:0xAE, name:OpCodeName::LDX, len:3, cycles:4, mode:AddressingMode::Absolute },
+        OpCode { byte:0xBE, name:OpCodeName::LDX, len:3, cycles:4, mode:AddressingMode::Absolute_Y },
+        OpCode { byte:0x85, name:OpCodeName::STA, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0x95, name:OpCodeName::STA, len:2, cycles:4, mode:AddressingMode::ZeroPage_X },
+        OpCode { byte:0x8D, name:OpCodeName::STA, len:3, cycles:4, mode:AddressingMode::Absolute },
+        OpCode { byte:0x9D, name:OpCodeName::STA, len:3, cycles:5, mode:AddressingMode::Absolute_X },
+        OpCode { byte:0x99, name:OpCodeName::STA, len:3, cycles:5, mode:AddressingMode::Absolute_Y },
+        OpCode { byte:0x81, name:OpCodeName::STA, len:2, cycles:6, mode:AddressingMode::Indirect_X },
+        OpCode { byte:0x91, name:OpCodeName::STA, len:2, cycles:6, mode:AddressingMode::Indirect_Y },
+        OpCode { byte:0xAA, name:OpCodeName::TAX, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xE8, name:OpCodeName::INX, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x00, name:OpCodeName::BRK, len:1, cycles:7, mode:AddressingMode::NonAddressing },
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();

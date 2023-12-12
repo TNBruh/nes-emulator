@@ -1,4 +1,4 @@
-use crate::{OPCODES_MAP, opcode::OpCode};
+use crate::{OPCODES_MAP, opcode::{OpCode, OpCodeName}};
 
 
 pub struct CPU {
@@ -113,11 +113,11 @@ impl CPU {
             let entry: &OpCode = OPCODES_MAP.get(&opscode).expect("WHERE IS MY SUPER SUIT?"); 
 
             match entry.name {
-                "LDA" => self.lda(entry),
-                "LDX" => self.ldx(entry),
-                "STA" => self.sta(entry),
-                "TAX" => self.tax(entry),
-                "INX" => self.inx(entry),
+                OpCodeName::LDA => self.lda(entry),
+                OpCodeName::LDX => self.ldx(entry),
+                OpCodeName::STA => self.sta(entry),
+                OpCodeName::TAX => self.tax(),
+                OpCodeName::INX => self.inx(),
                 _ => todo!("AMOGUS")
             }
 
@@ -129,23 +129,39 @@ impl CPU {
     }
 
     fn lda(&mut self, op: &OpCode) {
+        let data = self.mem_read(
+            self.get_operand_address(&op.mode)
+        );
+        self.register_a = data;
 
+        self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn ldx(&mut self, op: &OpCode) {
+        let data = self.mem_read(
+            self.get_operand_address(&op.mode)
+        );
+        self.register_x = data;
 
+        self.update_zero_and_negative_flags(self.register_x);
     }
 
     fn sta(&mut self, op: &OpCode) {
+        let addr = self.get_operand_address(&op.mode);
 
+        self.mem_write(addr, self.register_a);
     }
 
-    fn tax(&mut self, op: &OpCode) {
+    fn tax(&mut self) {
+        self.register_x = self.register_a;
 
+        self.update_zero_and_negative_flags(self.register_x);
     }
 
-    fn inx(&mut self, op: &OpCode) {
+    fn inx(&mut self) {
+        (self.register_x, _) = self.register_x.overflowing_add(1);
 
+        self.update_zero_and_negative_flags(self.register_x);
     }
 
     /* RM: C 3 P 2
