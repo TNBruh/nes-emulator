@@ -111,6 +111,9 @@ impl CPU {
             let opscode = self.mem_read(self.program_counter);
             self.program_counter += 1;
 
+            // debug print
+            println!("RUNNING OPCODE: {:#02x}", opscode);
+
             //saving the state for some reason?
             let temp_program_counter = self.program_counter;
 
@@ -192,7 +195,7 @@ impl CPU {
 
     fn jsr(&mut self, op: &OpCode) {
         let jmp_addr = self.get_operand_address(&op.mode);
-        let rtn_addr = (self.program_counter + 1).to_ne_bytes();
+        let rtn_addr = (self.program_counter + 1).to_be_bytes();
         self.push(rtn_addr[0]);
         self.push(rtn_addr[1]);
 
@@ -206,14 +209,19 @@ impl CPU {
         ]).wrapping_add(1);
     }
 
+    // stack
     fn push(&mut self, data: u8) {
-        self.mem_write(STACK_ORIGIN - self.stack_pointer as u16, data);
+        self.mem_write(self.get_stack_pointer(), data);
         self.stack_pointer = self.stack_pointer.wrapping_add(1);
     }
 
     fn pop(&mut self) -> u8 {
         self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        self.mem_read(STACK_ORIGIN - self.stack_pointer as u16)
+        self.mem_read(self.get_stack_pointer())
+    }
+
+    pub fn get_stack_pointer(&self) -> u16 {
+        STACK_ORIGIN - self.stack_pointer as u16
     }
 
     /* RM: C 3 P 2

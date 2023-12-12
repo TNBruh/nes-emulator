@@ -135,13 +135,134 @@ mod test {
     }
 
     //test pha
-    
+    #[test]
+    fn test_pha() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0x05, // set 0x05 in reg a
+            0x48, // push a to stack
+            0x00, // break
+        ]);
+
+        // real stack pointer should be at 0x01FF - 0x001
+        assert_eq!(cpu.get_stack_pointer(), 0x1FE);
+
+        // there should be 0x05 at 0x01FF
+        assert_eq!(cpu.mem_read(0x1FF), 0x05);
+
+        // stack pointer should have the value 0x001
+        assert_eq!(cpu.stack_pointer, 0x01);
+    }
 
     //test php
+    #[test]
+    fn test_php() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0x00, // set 0x00 in reg a, this should set the status reg
+            0x08, // push status to stack
+            0x00, // break
+        ]);
+
+        // real stack pointer should be at 0x01FF - 0x001
+        assert_eq!(cpu.get_stack_pointer(), 0x1FE);
+
+        // there should be status at 0x01FF
+        assert_eq!(cpu.mem_read(0x1FF) & 0b0000_0010, 0b0000_0010);
+
+        // stack pointer should have the value 0x001
+        assert_eq!(cpu.stack_pointer, 0x01);
+    }
 
     //test jsr
+    #[test]
+    fn test_jsr() {
+        let mut cpu = CPU::new();
 
-    //test rts
+        cpu.load_and_run(vec![
+            0x20, 0x05, 0x80, // jump pc to 0x8050, push 0x8002 to stack as [0x1FF: 0x80, 0x1FE: 0x05]
+            0xa9, 0x05, // set 0x05 on reg a, this shouldn't run
+            0xa2, 0x04, //set 0x04 on reg x, this should run
+            0x00, // break
+        ]);
+
+        // check reg x
+        assert_eq!(cpu.register_x, 0x04);
+
+        // check reg a
+        assert_eq!(cpu.register_a, 0x00);
+
+        // check stack
+        assert_eq!(cpu.mem_read(0x01FF), 0x80);
+        assert_eq!(cpu.mem_read(0x01FE), 0x02);
+        
+        // check pc
+        assert_eq!(cpu.program_counter, 0x8008);
+
+    }
+
+    // deprecated test rts
+    // this test isn't deleted because it may trigger my future self's neuron
+    // yes, the error is on purpose
+    #[test]
+    fn deprecated_test_rts() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0x20, 0x05, 0x80, // jump pc to 0x8050, push 0x8002 to stack as [0x1FF: 0x80, 0x1FE: 0x05]
+            0xa9, 0x05, // set 0x05 on reg a, this should run after RTS
+            0xa2, 0x04, //set 0x04 on reg x, this should run
+            0x60, // jumps to 0x8003
+            0x00, // break
+        ]);
+
+        
+        // check reg x
+        assert_eq!(cpu.register_x, 0x04);
+
+        // check reg a
+        assert_eq!(cpu.register_a, 0x05);
+
+        // check stack
+        assert_eq!(cpu.mem_read(0x01FF), 0x80); // if you check our pop func, we don't zeroize it
+        assert_eq!(cpu.mem_read(0x01FE), 0x02); // why? as of now, i don't know why we should do so
+        
+        // check pc
+        assert_eq!(cpu.program_counter, 0x8009);
+    }
+
+    // test rts
+    #[test]
+    fn test_rts() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0x20, 0x06, 0x80, // jump pc to 0x8050, push 0x8002 to stack as [0x1FF: 0x80, 0x1FE: 0x05]
+            0x00, // break
+            0xa9, 0x05, // set 0x05 on reg a, this shouldn't run
+            0xa2, 0x04, //set 0x04 on reg x, this should run
+            0x60, // jumps to 0x8003
+            0xa9, 0x03, // set reg a = 0x03, shouldn't run
+            0xa2, 0x02, // set reg x = 0x02, shouldn't run
+            0x00, // break
+        ]);
+
+        
+        // check reg x
+        assert_eq!(cpu.register_x, 0x04);
+
+        // check reg a
+        assert_eq!(cpu.register_a, 0x00);
+
+        // check stack
+        assert_eq!(cpu.mem_read(0x01FF), 0x80); // if you check our pop func, we don't zeroize it
+        assert_eq!(cpu.mem_read(0x01FE), 0x02); // why? as of now, i don't know why we should do so
+        
+        // check pc
+        assert_eq!(cpu.program_counter, 0x8004);
+    }
 }
 // #[cfg(test)]
 // mod test {
