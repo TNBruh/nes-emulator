@@ -118,6 +118,8 @@ impl CPU {
                 OpCodeName::STA => self.sta(entry),
                 OpCodeName::TAX => self.tax(),
                 OpCodeName::INX => self.inx(),
+                OpCodeName::BRK => break,
+                #[allow(unreachable_patterns)]
                 _ => todo!("AMOGUS")
             }
 

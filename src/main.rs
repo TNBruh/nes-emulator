@@ -107,7 +107,6 @@ mod test {
         assert_eq!(cpu.register_x, 1)
     }    
 }
-
 // #[cfg(test)]
 // mod test {
 //     use crate::cpu::CPU;
