@@ -136,6 +136,9 @@ impl CPU {
                 OpCodeName::PHP => self.php(),
                 OpCodeName::JSR => self.jsr(entry),
                 OpCodeName::RTS => self.rts(),
+                OpCodeName::PLA => self.pla(),
+                OpCodeName::PLP => self.plp(),
+                OpCodeName::RTI => self.rti(),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
@@ -207,6 +210,24 @@ impl CPU {
             self.pop(),
             self.pop()
         ]).wrapping_add(1);
+    }
+
+    fn pla(&mut self) {
+        self.register_a = self.pop();
+
+        self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn plp(&mut self) {
+        self.status = self.pop();
+    }
+
+    fn rti(&mut self) {
+        self.status = self.pop();
+        self.program_counter = u16::from_le_bytes([
+            self.pop(),
+            self.pop()
+        ]);
     }
 
     // stack

@@ -49,6 +49,9 @@ lazy_static!{
         OpCode { byte:0x08, name:OpCodeName::PHP, len:1, cycles:3, mode:AddressingMode::NonAddressing },
         OpCode { byte:0x20, name:OpCodeName::JSR, len:3, cycles:6, mode:AddressingMode::Absolute },
         OpCode { byte:0x60, name:OpCodeName::RTS, len:1, cycles:6, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x68, name:OpCodeName::PLA, len:1, cycles:4, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x28, name:OpCodeName::PLP, len:1, cycles:4, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x40, name:OpCodeName::RTI, len:1, cycles:6, mode:AddressingMode::NonAddressing },
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
