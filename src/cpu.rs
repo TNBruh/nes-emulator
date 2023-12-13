@@ -231,7 +231,17 @@ impl CPU {
         ]);
     }
 
+    // read :)
+    // https://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
     fn adc(&mut self, op: &OpCode) {
+        
+    }
+
+    fn and(&mut self, op: &OpCode) {
+
+    }
+
+    fn asl(&mut self, op: &OpCode) {
         
     }
 
