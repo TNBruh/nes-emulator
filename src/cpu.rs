@@ -1,7 +1,6 @@
 use crate::{OPCODES_MAP, opcode::{OpCode, OpCodeName}};
 
 const STACK_ORIGIN: u16 = 0x01FF; // stack grows down and ends at 0x100. overflow will cause it to wrap back
-const STACK: u8 = 0x0; // use this to reset stack. the previous one is just a ref point
 
 pub struct CPU {
     pub register_a: u8,
@@ -20,7 +19,7 @@ impl CPU {
             register_x: 0,
             register_y: 0,
             status: 0, 
-            stack_pointer: STACK,
+            stack_pointer: 0,
             program_counter: 0,
             memory: [0; 0xFFFF],
         }
@@ -90,7 +89,7 @@ impl CPU {
         self.register_x = 0;
         self.register_y = 0;
         self.status = 0;
-        self.stack_pointer = STACK;
+        self.stack_pointer = 0;
 
         self.program_counter = self.mem_read_u16(0xFFFC);
     }
@@ -115,6 +114,7 @@ impl CPU {
             println!("RUNNING OPCODE: {:#02x}", opscode);
 
             //saving the state for some reason?
+            // answer's below
             let temp_program_counter = self.program_counter;
 
             //coerced (i think that's the word): &&OpCode -> &OpCode

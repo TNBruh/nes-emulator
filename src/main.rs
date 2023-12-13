@@ -72,6 +72,8 @@ fn main() {
 
 #[cfg(test)]
 mod test {
+    use std::vec;
+
     use crate::cpu::CPU;
 
     #[test]
@@ -266,6 +268,79 @@ mod test {
         // check pc
         assert_eq!(cpu.program_counter, 0x8004);
     }
+
+    // test pla
+    #[test]
+    fn test_pla() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0x0, //set reg a = 0x0
+            0x48, //push reg a
+            0xa9, 0x5, //set reg a = 0x5
+            0x68, //pop stack, set reg a
+            0x0, //break
+        ]);
+
+        // check stack, should be 0x01FF
+        assert_eq!(cpu.get_stack_pointer(), 0x01FF);
+
+        // check flag, flag Z should be up
+        assert_eq!(cpu.status & 0b0000_0010, 0b0000_0010);
+
+        // check reg a, should be 0x0
+        assert_eq!(cpu.register_a, 0x0);
+    }
+
+    // test plp
+    #[test]
+    fn test_plp() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0x0, //set reg a = 0x0
+            0x08, //push status
+            0xa9, 0x5, //set reg a = 0x5
+            0x28, // pull into status
+            0x0, // break
+        ]);
+
+        //check stack
+        assert_eq!(cpu.get_stack_pointer(), 0x1FF);
+
+        //check flag
+        assert_eq!(cpu.status & 0b0000_0010, 0b0000_0010);
+    }
+
+    // test rti
+    #[test]
+    fn test_rti() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0x80, // reg a = 0x80
+            0x48, // push a
+            0xa9, 0xD, // reg a = 0x22
+            0x48, // push a; [0x01FF: 0x80, 0x01FE: 0x0D]
+            0xa9, 0x48, // reg a = 0x48 [0x01FD: 0x48]
+            0x48, // push a; this will be status
+            0x40, // rti; status = 0x48 and pc = 0x800D // this is 0x8009
+            0x0, // 0x800A
+            0x0, // 0x800B
+            0x0, // 0x800C
+            0x0, // 0x800D
+        ]);
+
+        // check stack
+        assert_eq!(cpu.get_stack_pointer(), 0x1FF);
+
+        // check flag
+        assert_eq!(cpu.status, 0x48);
+
+        // check pc
+        assert_eq!(cpu.program_counter, 0x800E);
+    }
+
 }
 // #[cfg(test)]
 // mod test {
