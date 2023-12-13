@@ -1,4 +1,5 @@
 use crate::{OPCODES_MAP, opcode::{OpCode, OpCodeName}};
+use bitflags::bitflags;
 
 const STACK_ORIGIN: u16 = 0x01FF; // stack grows down and ends at 0x100. overflow will cause it to wrap back
 
@@ -6,7 +7,7 @@ pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
     pub register_y: u8,
-    pub status: u8,
+    pub status: CPUStatus,
     pub stack_pointer: u8,
     pub program_counter: u16,
     memory: [u8; 0xFFFF]
@@ -18,7 +19,7 @@ impl CPU {
             register_a: 0, 
             register_x: 0,
             register_y: 0,
-            status: 0, 
+            status: CPUStatus::empty(), 
             stack_pointer: 0,
             program_counter: 0,
             memory: [0; 0xFFFF],
@@ -88,7 +89,7 @@ impl CPU {
         self.register_a = 0;
         self.register_x = 0;
         self.register_y = 0;
-        self.status = 0;
+        self.status = CPUStatus::empty();
         self.stack_pointer = 0;
 
         self.program_counter = self.mem_read_u16(0xFFFC);
@@ -193,7 +194,7 @@ impl CPU {
     }
 
     fn php(&mut self) { // i'm supposed to do something about the break flag? yet the wiki only says to push the status reg. oh well
-        self.push(self.status);
+        self.push(self.status.bits());
     }
 
     fn jsr(&mut self, op: &OpCode) {
@@ -219,15 +220,19 @@ impl CPU {
     }
 
     fn plp(&mut self) {
-        self.status = self.pop();
+        self.status = CPUStatus::from_bits(self.pop()).expect("FAILED TO COERCE STATUS IN PLP");
     }
 
     fn rti(&mut self) {
-        self.status = self.pop();
+        self.status = CPUStatus::from_bits(self.pop()).expect("FAILED TO COERCE STATUS IN RTI");
         self.program_counter = u16::from_le_bytes([
             self.pop(),
             self.pop()
         ]);
+    }
+
+    fn adc(&mut self, op: &OpCode) {
+        
     }
 
     // stack
@@ -280,15 +285,15 @@ impl CPU {
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 { // if zero
-            self.status |= 0b0000_0010;
+            self.status.insert(CPUStatus::Zero);
         } else {
-            self.status &= 0b0000_0010;
+            self.status.remove(CPUStatus::Zero);
         }
 
         if result & 0b1000_0000 != 0 { //if negative
-            self.status |= 0b1000_0000;
+            self.status.insert(CPUStatus::Negative);
         } else {
-            self.status &= 0b0000_0010;
+            self.status.remove(CPUStatus::Negative);
         }
     }
 }
@@ -306,4 +311,18 @@ pub enum AddressingMode {
     Indirect_X,
     Indirect_Y,
     NonAddressing
+}
+
+bitflags! {
+    #[derive(Debug, Clone, Copy)]
+    pub struct CPUStatus: u8 {
+        const Carry = 0b0000_0001;
+        const Zero = 0b0000_0010;
+        const InterruptDisable = 0b0000_0100;
+        const Decimal = 0b0000_1000;
+        const Break = 0b0001_0000;
+        const Unused = 0b0010_0000;
+        const Overflow = 0b0100_0000;
+        const Negative = 0b1000_0000;
+    }
 }

@@ -74,22 +74,22 @@ fn main() {
 mod test {
     use std::vec;
 
-    use crate::cpu::CPU;
+    use crate::cpu::{CPU, CPUStatus};
 
     #[test]
     fn test_0xa9_lda_immediate_load_data() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa9, 0x05, 0x00]);
         assert_eq!(cpu.register_a, 0x05);
-        assert!(cpu.status & 0b0000_0010 == 0b00);
-        assert!(cpu.status & 0b1000_0000 == 0);
+        assert!(!cpu.status.contains(CPUStatus::Zero));
+        assert!(!cpu.status.contains(CPUStatus::Negative));
     }
 
     #[test]
     fn test_0xa9_lda_zero_flag() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xa9, 0x00, 0x00]);
-        assert!(cpu.status & 0b0000_0010 == 0b10);
+        assert!(cpu.status.contains(CPUStatus::Zero));
     }
 
     #[test]
@@ -286,7 +286,7 @@ mod test {
         assert_eq!(cpu.get_stack_pointer(), 0x01FF);
 
         // check flag, flag Z should be up
-        assert_eq!(cpu.status & 0b0000_0010, 0b0000_0010);
+        assert!(cpu.status.contains(CPUStatus::Zero));
 
         // check reg a, should be 0x0
         assert_eq!(cpu.register_a, 0x0);
@@ -309,7 +309,7 @@ mod test {
         assert_eq!(cpu.get_stack_pointer(), 0x1FF);
 
         //check flag
-        assert_eq!(cpu.status & 0b0000_0010, 0b0000_0010);
+        assert!(cpu.status.contains(CPUStatus::Zero));
     }
 
     // test rti
@@ -335,7 +335,7 @@ mod test {
         assert_eq!(cpu.get_stack_pointer(), 0x1FF);
 
         // check flag
-        assert_eq!(cpu.status, 0x48);
+        assert_eq!(cpu.status.bits(), 0x48);
 
         // check pc
         assert_eq!(cpu.program_counter, 0x800E);
