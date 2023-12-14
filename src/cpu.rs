@@ -234,15 +234,45 @@ impl CPU {
     // read :)
     // https://www.righto.com/2012/12/the-6502-overflow-flag-explained.html
     fn adc(&mut self, op: &OpCode) {
+        let (m, n) = (self.register_a, self.mem_read(self.get_operand_address(&op.mode)));
+        let data: u16 = m as u16 + 
+                        n as u16 + 
+                        if self.status.contains(CPUStatus::Carry) { 1 } else { 0 };
         
+        self.register_a = data as u8;
+        self.update_zero_and_negative_flags(self.register_a);
+        self.status.set(CPUStatus::Carry, data > 0xFF);
+        self.status.set(CPUStatus::Overflow, 
+            (m ^ (data as u8)) & (n ^ (data as u8)) * 0x80 != 0x0
+        );
     }
 
     fn and(&mut self, op: &OpCode) {
+        self.register_a &= self.mem_read(self.get_operand_address(&op.mode));
 
+        self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn asl(&mut self, op: &OpCode) {
+        let addr = self.get_operand_address(&op.mode);
+        let data = (
+            self.mem_read(addr) 
+            as u16
+        ) << 1;
+
+        self.mem_write(addr, data as u8);
+
+        self.status.set(CPUStatus::Carry, data > 0xFF);
+        self.update_zero_and_negative_flags(data as u8);
+    }
+
+    fn asl_accumulator(&mut self) {
+        let data = (self.register_a as u16) << 1;
         
+        self.register_a = data as u8;
+
+        self.status.set(CPUStatus::Carry, data > 0xFF);
+        self.update_zero_and_negative_flags(data as u8);
     }
 
     // stack

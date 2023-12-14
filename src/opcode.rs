@@ -9,11 +9,12 @@ pub struct OpCode {
     pub mode: AddressingMode,
 }
 
-
+#[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy)]
 pub enum OpCodeName {
     LDA, LDX, STA, TAX, INX,
     BRK, PHA, PHP, JSR, RTS,
-    PLA, PLP, RTI, 
+    PLA, PLP, RTI, ADC, AND,
+    ASL, ASL_A,
 }
 
