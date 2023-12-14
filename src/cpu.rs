@@ -323,6 +323,20 @@ pub enum AddressingMode {
     NonAddressing
 }
 
+/*
+7  bit  0
+---- ----
+NV1B DIZC
+|||| ||||
+|||| |||+- Carry
+|||| ||+-- Zero
+|||| |+--- Interrupt Disable
+|||| +---- Decimal
+|||+------ (No CPU effect; see: the B flag)
+||+------- (No CPU effect; always pushed as 1)
+|+-------- Overflow
++--------- Negative
+*/
 bitflags! {
     #[derive(Debug, Clone, Copy)]
     pub struct CPUStatus: u8 {
