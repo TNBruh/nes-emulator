@@ -140,6 +140,8 @@ impl CPU {
                 OpCodeName::PLA => self.pla(),
                 OpCodeName::PLP => self.plp(),
                 OpCodeName::RTI => self.rti(),
+                // OpCodeName::ADC => self.asl(entry),
+                // Opco
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
