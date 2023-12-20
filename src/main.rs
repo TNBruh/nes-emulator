@@ -68,7 +68,7 @@ lazy_static!{
         OpCode { byte:0x39, name:OpCodeName::AND, len:3, cycles:4, mode:AddressingMode::Absolute_Y },
         OpCode { byte:0x21, name:OpCodeName::AND, len:2, cycles:6, mode:AddressingMode::Indirect_X },
         OpCode { byte:0x31, name:OpCodeName::AND, len:2, cycles:5, mode:AddressingMode::Indirect_Y },
-        OpCode { byte:0x0A, name:OpCodeName::ASL_A, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x0A, name:OpCodeName::ASL, len:1, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0x06, name:OpCodeName::ASL, len:2, cycles:5, mode:AddressingMode::ZeroPage },
         OpCode { byte:0x16, name:OpCodeName::ASL, len:2, cycles:6, mode:AddressingMode::ZeroPage_X },
         OpCode { byte:0x0E, name:OpCodeName::ASL, len:3, cycles:6, mode:AddressingMode::Absolute },

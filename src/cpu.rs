@@ -143,7 +143,6 @@ impl CPU {
                 OpCodeName::ADC => self.adc(entry),
                 OpCodeName::AND => self.and(entry),
                 OpCodeName::ASL => self.asl(entry),
-                OpCodeName::ASL_A => self.asl_accumulator(),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
@@ -258,25 +257,31 @@ impl CPU {
     }
 
     fn asl(&mut self, op: &OpCode) {
-        let addr = self.get_operand_address(&op.mode);
-        let data = (
-            self.mem_read(addr) 
-            as u16
-        ) << 1;
+        match &op.mode {
+            AddressingMode::ZeroPage | AddressingMode::ZeroPage_X |
+            AddressingMode::Absolute | AddressingMode::Absolute_X => {
+                let addr = self.get_operand_address(&op.mode);
+                let data = (
+                    self.mem_read(addr) 
+                    as u16
+                ) << 1;
 
-        self.mem_write(addr, data as u8);
+                self.mem_write(addr, data as u8);
 
-        self.status.set(CPUStatus::Carry, data > 0xFF);
-        self.update_zero_and_negative_flags(data as u8);
-    }
-
-    fn asl_accumulator(&mut self) {
-        let data = (self.register_a as u16) << 1;
+                self.status.set(CPUStatus::Carry, data > 0xFF);
+                self.update_zero_and_negative_flags(data as u8);
+            },
+            AddressingMode::NonAddressing => { //this will catch the ASL with accumulator
+                let data = (self.register_a as u16) << 1;
         
-        self.register_a = data as u8;
+                self.register_a = data as u8;
 
-        self.status.set(CPUStatus::Carry, data > 0xFF);
-        self.update_zero_and_negative_flags(data as u8);
+                self.status.set(CPUStatus::Carry, data > 0xFF);
+                self.update_zero_and_negative_flags(data as u8);
+            },
+            _ => self.unknown_opcode_crash(op),
+        }
+        
     }
 
     // stack
@@ -294,39 +299,7 @@ impl CPU {
         STACK_ORIGIN - self.stack_pointer as u16
     }
 
-    /* RM: C 3 P 2
-    // fn lda(&mut self, mode: &AddressingMode) {
-    //     self.register_a = self.mem_read(
-    //         self.get_operand_address(mode)
-    //     );
-
-    //     self.update_zero_and_negative_flags(self.register_a)
-    // }
-
-    // fn ldx(&mut self, mode: &AddressingMode) {
-    //     self.register_x = self.mem_read(
-    //         self.get_operand_address(mode)
-    //     );
-
-    //     self.update_zero_and_negative_flags(self.register_x)
-    // }
-
-    // fn sta(&mut self, mode: &AddressingMode) {
-    //     let addr = self.get_operand_address(mode);
-    //     self.mem_write(addr, self.register_a)
-    // }
-
-    // fn tax(&mut self) {
-    //     self.register_x = self.register_a;
-    //     self.update_zero_and_negative_flags(self.register_x);
-    // }
-
-    // fn inx(&mut self) {
-    //     (self.register_x, _) = self.register_x.overflowing_add(1);
-    //     self.update_zero_and_negative_flags(self.register_x);
-    // }
-    */
-
+    // flag updates
     fn update_zero_and_negative_flags(&mut self, result: u8) {
         if result == 0 { // if zero
             self.status.insert(CPUStatus::Zero);
@@ -339,6 +312,11 @@ impl CPU {
         } else {
             self.status.remove(CPUStatus::Negative);
         }
+    }
+
+    // jarvis, uninstall his life
+    fn unknown_opcode_crash(&self, op: &OpCode) -> ! {
+        todo!("{:#?}: {:02x}", op.mode, op.byte)
     }
 }
 
