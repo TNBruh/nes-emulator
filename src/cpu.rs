@@ -140,8 +140,10 @@ impl CPU {
                 OpCodeName::PLA => self.pla(),
                 OpCodeName::PLP => self.plp(),
                 OpCodeName::RTI => self.rti(),
-                // OpCodeName::ADC => self.asl(entry),
-                // Opco
+                OpCodeName::ADC => self.adc(entry),
+                OpCodeName::AND => self.and(entry),
+                OpCodeName::ASL => self.asl(entry),
+                OpCodeName::ASL_A => self.asl_accumulator(),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
@@ -245,7 +247,7 @@ impl CPU {
         self.update_zero_and_negative_flags(self.register_a);
         self.status.set(CPUStatus::Carry, data > 0xFF);
         self.status.set(CPUStatus::Overflow, 
-            (m ^ (data as u8)) & (n ^ (data as u8)) * 0x80 != 0x0
+            (m ^ (data as u8)) & (n ^ (data as u8)) & 0x80 != 0x0
         );
     }
 

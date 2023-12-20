@@ -362,6 +362,113 @@ mod test {
         assert_eq!(cpu.program_counter, 0x800E);
     }
 
+    // test adc
+    #[test]
+    fn test_adc() {
+        // test normal addition
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xA9, 0x01, // reg a = 0x01
+            0x69, 0x01, // reg a += 0x01
+            0x00,
+        ]);
+        assert_eq!(cpu.register_a, 0x02);
+
+
+        // test overflow addition
+        // no overflow
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0xFF,
+            0x69, 0xFF,
+        ]); 
+        assert!(!cpu.status.contains(CPUStatus::Overflow));
+        assert!(cpu.status.contains(CPUStatus::Carry));
+        assert_eq!(cpu.register_a, 0b1111_1110);
+        // overflow
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0b0111_0000,
+            0x69, 0b0100_0000,
+            0x00,
+        ]);
+        assert!(cpu.status.contains(CPUStatus::Overflow));
+        assert!(!cpu.status.contains(CPUStatus::Carry));
+        assert_eq!(cpu.register_a, 0b1011_0000);
+
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0b1100_0000,
+            0x69, 0b1100_0000,
+            0x00,
+        ]);
+        assert_eq!(cpu.register_a, 0b1000_0000);
+        assert!(!cpu.status.contains(CPUStatus::Overflow));
+        assert!(cpu.status.contains(CPUStatus::Carry));
+    }
+
+    // test and
+    #[test]
+    fn test_and() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0b1000_0000,
+            0x29, 0x00,
+            0x00
+        ]);
+        assert!(cpu.status.contains(CPUStatus::Zero));
+        assert!(!cpu.status.contains(CPUStatus::Negative));
+        
+        cpu.load_and_run(vec![
+            0xa9, 0b1000_0000,
+            0x29, 0b1000_0000,
+            0x00,
+        ]);
+        assert!(!cpu.status.contains(CPUStatus::Zero));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+
+        cpu.load_and_run(vec![
+            0xa9, 0b0011_0000,
+            0x29, 0b0011_1100,
+            0x00,
+        ]);
+        assert_eq!(cpu.register_a, 0b0011_0000);
+    }
+
+    // test asl
+    #[test]
+    fn test_asl() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0b1100_0000, //reg a = 0b1100_0000
+            0x48, // push reg a
+            0x0e, 0xff, 0x01, // shift 0x01ff by 1
+            0x68, //pop into reg a 
+            0x00, 
+        ]);
+
+        assert!(cpu.status.contains(CPUStatus::Carry));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+        assert_eq!(cpu.register_a, 0b1000_0000);
+    }
+
+    // test asl_a
+    #[test]
+    fn test_asl_a() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0b1100_0000,
+            0x0a,
+            0x00,
+        ]);
+
+        assert!(cpu.status.contains(CPUStatus::Carry));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+        assert_eq!(cpu.register_a, 0b1000_0000);
+    }
+
 }
 // #[cfg(test)]
 // mod test {
