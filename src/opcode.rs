@@ -12,9 +12,9 @@ pub struct OpCode {
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy)]
 pub enum OpCodeName {
-    LDA, LDX, STA, TAX, INX,
-    BRK, PHA, PHP, JSR, RTS,
-    PLA, PLP, RTI, ADC, AND,
-    ASL, ASL_A,
+    LDA(u8), LDX(u8), STA(u8), TAX(u8), INX(u8),
+    BRK(u8), PHA(u8), PHP(u8), JSR(u8), RTS(u8),
+    PLA(u8), PLP(u8), RTI(u8), ADC(u8), AND(u8),
+    ASL(u8),
 }
 
