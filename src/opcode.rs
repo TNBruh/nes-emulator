@@ -15,6 +15,6 @@ pub enum OpCodeName {
     LDA, LDX, STA, TAX, INX,
     BRK, PHA, PHP, JSR, RTS,
     PLA, PLP, RTI, ADC, AND,
-    ASL,
+    ASL, BCC, BCS, BEQ,
 }
 

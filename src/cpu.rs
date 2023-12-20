@@ -284,6 +284,24 @@ impl CPU {
         
     }
 
+    fn bcc(&mut self, op: &OpCode) {
+        if !self.status.contains(CPUStatus::Carry) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn bcs(&mut self, op: &OpCode) {
+        if self.status.contains(CPUStatus::Carry) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn beq(&mut self, op: &OpCode) {
+        if self.status.contains(CPUStatus::Zero) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
     // stack
     fn push(&mut self, data: u8) {
         self.mem_write(self.get_stack_pointer(), data);
@@ -293,6 +311,11 @@ impl CPU {
     fn pop(&mut self) -> u8 {
         self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         self.mem_read(self.get_stack_pointer())
+    }
+    
+    // branch
+    fn branch(&mut self, op: &OpCode, dist: i8) {
+        self.program_counter = self.program_counter.wrapping_add((op.len - 1) as u16).wrapping_add_signed(dist as i16);
     }
 
     pub fn get_stack_pointer(&self) -> u16 {

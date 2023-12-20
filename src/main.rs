@@ -84,11 +84,15 @@ lazy_static!{
 }
 
 fn main() {
-    let num: u16 = 0x1234;
-    let le_num = num.to_le_bytes();
+    // let num: u16 = 0x1234;
+    // let le_num = num.to_le_bytes();
 
-    println!("{:X} {:X}", le_num[0], le_num[1]);
-    println!("{}", u16::from_be_bytes([0x01, 0x00]));
+    // println!("{:X} {:X}", le_num[0], le_num[1]);
+    // println!("{}", u16::from_be_bytes([0x01, 0x00]));
+    
+    let num: i8 = -1;
+    let new_num: u16 = (num as u16) + 1;
+    println!("{:X} {:#}", new_num, new_num);
 }
 
 #[cfg(test)]
