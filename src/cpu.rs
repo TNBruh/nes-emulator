@@ -148,7 +148,7 @@ impl CPU {
                 OpCodeName::BEQ => self.beq(entry),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
-                _ => todo!("AMOGUS")
+                _ => todo!("ඞ AMOGUS JUMPSCARE ඞ")
             }
 
             // idk why we do this. maybe it will be explained later
@@ -300,6 +300,35 @@ impl CPU {
 
     fn beq(&mut self, op: &OpCode) {
         if self.status.contains(CPUStatus::Zero) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn bit(&mut self, op: &OpCode) {
+        let m = self.mem_read(
+            self.get_operand_address(&op.mode)
+        );
+        let data = self.register_a & m;
+
+        if data == 0 {
+            self.status.insert(CPUStatus::Zero);   
+        }
+        if m & 0b1000_0000 > 0 {
+            self.status.insert(CPUStatus::Negative);
+        }
+        if m & 0b0100_0000 > 0 {
+            self.status.insert(CPUStatus::Overflow);
+        }
+    }
+
+    fn bmi(&mut self, op: &OpCode) {
+        if self.status.contains(CPUStatus::Negative) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn bne(&mut self, op: &OpCode) {
+        if !self.status.contains(CPUStatus::Zero) {
             self.branch(op, self.mem_read(self.program_counter) as i8)
         }
     }
