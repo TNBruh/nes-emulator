@@ -73,6 +73,9 @@ lazy_static!{
         OpCode { byte:0x16, name:OpCodeName::ASL, len:2, cycles:6, mode:AddressingMode::ZeroPage_X },
         OpCode { byte:0x0E, name:OpCodeName::ASL, len:3, cycles:6, mode:AddressingMode::Absolute },
         OpCode { byte:0x1E, name:OpCodeName::ASL, len:3, cycles:7, mode:AddressingMode::Absolute_X },
+        OpCode { byte:0x90, name:OpCodeName::BCC, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xB0, name:OpCodeName::BCS, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xF0, name:OpCodeName::BEQ, len:2, cycles:2, mode:AddressingMode::NonAddressing },
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
@@ -90,9 +93,9 @@ fn main() {
     // println!("{:X} {:X}", le_num[0], le_num[1]);
     // println!("{}", u16::from_be_bytes([0x01, 0x00]));
     
-    let num: i8 = -1;
-    let new_num: u16 = (num as u16) + 1;
-    println!("{:X} {:#}", new_num, new_num);
+    // let num: i8 = -1;
+    // let new_num: u16 = (num as u16) + 1;
+    // println!("{:X} {:#}", new_num, new_num);
 }
 
 #[cfg(test)]
@@ -410,6 +413,7 @@ mod test {
         assert_eq!(cpu.register_a, 0b1000_0000);
         assert!(!cpu.status.contains(CPUStatus::Overflow));
         assert!(cpu.status.contains(CPUStatus::Carry));
+        assert!(cpu.status.contains(CPUStatus::Negative));
     }
 
     // test and
@@ -471,6 +475,96 @@ mod test {
         assert!(cpu.status.contains(CPUStatus::Carry));
         assert!(cpu.status.contains(CPUStatus::Negative));
         assert_eq!(cpu.register_a, 0b1000_0000);
+    }
+
+    #[test]
+    fn test_bcc() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0xff, //reg a = 255
+            0x0a, //reg a shift left
+            0x90, 0x03, //if carry, branch
+            0xa9, 0x02, // if carry is set, go here
+            0x0,
+            0xa9, 0x03, // if carry is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x02);
+        assert!(cpu.status.contains(CPUStatus::Carry));
+
+        cpu.load_and_run(vec![
+            0xa9, 0x01, //reg a = 1
+            0x90, 0x03, //if carry, branch
+            0xa9, 0x02, // if carry is set, go here
+            0x0,
+            0xa9, 0x03, // if carry is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x03);
+        assert!(!cpu.status.contains(CPUStatus::Carry));
+        assert!(!cpu.status.contains(CPUStatus::Negative));
+
+    }
+
+    #[test]
+    fn test_bcs() {
+        let mut cpu = CPU::new();
+
+        cpu.load_and_run(vec![
+            0xa9, 0xff, //reg a = 255
+            0x0a, //reg a shift left
+            0xB0, 0x03, //if carry, branch
+            0xa9, 0x02, // if carry is set, go here
+            0x0,
+            0xa9, 0x03, // if carry is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x03);
+        assert!(cpu.status.contains(CPUStatus::Carry));
+
+        cpu.load_and_run(vec![
+            0xa9, 0x01, //reg a = 1
+            0xB0, 0x03, //if carry, branch
+            0xa9, 0x02, // if carry is set, go here
+            0x0,
+            0xa9, 0x03, // if carry is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x02);
+        assert!(!cpu.status.contains(CPUStatus::Carry));
+        assert!(!cpu.status.contains(CPUStatus::Negative));
+    }
+
+    #[test]
+    fn test_beq() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0,
+            0xF0, 0x03, //if zero, branch
+            0xa9, 0x02, // if zero is set, go here
+            0x0,
+            0xa9, 0x03, // if zero is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x03);
+
+        
+        cpu.load_and_run(vec![
+            0xa9, 1,
+            0xF0, 0x03, //if zero, branch
+            0xa9, 0x02, // if zero is set, go here
+            0x0,
+            0xa9, 0x03, // if zero is set, reg a = 3
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x02);
     }
 
 }

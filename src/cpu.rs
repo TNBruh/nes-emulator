@@ -143,6 +143,9 @@ impl CPU {
                 OpCodeName::ADC => self.adc(entry),
                 OpCodeName::AND => self.and(entry),
                 OpCodeName::ASL => self.asl(entry),
+                OpCodeName::BCC => self.bcc(entry),
+                OpCodeName::BCS => self.bcs(entry),
+                OpCodeName::BEQ => self.beq(entry),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("AMOGUS")
@@ -157,10 +160,9 @@ impl CPU {
     }
 
     fn lda(&mut self, op: &OpCode) {
-        let data = self.mem_read(
+        self.register_a = self.mem_read(
             self.get_operand_address(&op.mode)
         );
-        self.register_a = data;
 
         self.update_zero_and_negative_flags(self.register_a);
     }
