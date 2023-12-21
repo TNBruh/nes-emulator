@@ -76,6 +76,11 @@ lazy_static!{
         OpCode { byte:0x90, name:OpCodeName::BCC, len:2, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0xB0, name:OpCodeName::BCS, len:2, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0xF0, name:OpCodeName::BEQ, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x2C, name:OpCodeName::BIT, len:3, cycles:4, mode:AddressingMode::Absolute },
+        OpCode { byte:0x89, name:OpCodeName::BIT, len:2, cycles:3, mode:AddressingMode::Immediate },
+        OpCode { byte:0x24, name:OpCodeName::BIT, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0x30, name:OpCodeName::BMI, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xD0, name:OpCodeName::BNE, len:2, cycles:2, mode:AddressingMode::NonAddressing },
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
@@ -565,6 +570,21 @@ mod test {
         ]);
 
         assert_eq!(cpu.register_a, 0x02);
+    }
+
+    #[test]
+    fn test_bit() {
+
+    }
+
+    #[test]
+    fn test_bmi() {
+
+    }
+
+    #[test]
+    fn test_bne() {
+
     }
 
 }
