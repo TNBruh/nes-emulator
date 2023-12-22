@@ -16,6 +16,6 @@ pub enum OpCodeName {
     BRK, PHA, PHP, JSR, RTS,
     PLA, PLP, RTI, ADC, AND,
     ASL, BCC, BCS, BEQ, BIT,
-    BMI, BNE,
+    BMI, BNE, BPL, BVC, BVS,
 }
 

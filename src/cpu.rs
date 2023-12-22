@@ -342,6 +342,28 @@ impl CPU {
         }
     }
 
+    fn bpl(&mut self, op: &OpCode) {
+        if !self.status.contains(CPUStatus::Negative) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn brk(&mut self) {
+
+    }
+
+    fn bvc(&mut self, op: &OpCode) {
+        if !self.status.contains(CPUStatus::Overflow) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
+    fn bvs(&mut self, op: &OpCode) {
+        if self.status.contains(CPUStatus::Overflow) {
+            self.branch(op, self.mem_read(self.program_counter) as i8)
+        }
+    }
+
     // stack
     fn push(&mut self, data: u8) {
         self.mem_write(self.get_stack_pointer(), data);
