@@ -574,17 +574,102 @@ mod test {
 
     #[test]
     fn test_bit() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![
+            0xa9, 0,
+            0x89, 0b1100_0000,
+            0x0,
+        ]);
 
+        assert!(cpu.status.contains(CPUStatus::Zero));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+        assert!(cpu.status.contains(CPUStatus::Overflow));
+        
+        cpu.load_and_run(vec![
+            0xa9, 0b1000_0000,
+            0x89, 0b1100_0000,
+            0x0,
+        ]);
+
+        assert!(!cpu.status.contains(CPUStatus::Zero));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+        assert!(cpu.status.contains(CPUStatus::Overflow));
+        
+        cpu.load_and_run(vec![
+            0xa9, 0b1000_0000,
+            0x89, 0b1100_0000,
+            0x0,
+        ]);
+
+        assert!(!cpu.status.contains(CPUStatus::Zero));
+        assert!(cpu.status.contains(CPUStatus::Negative));
+        assert!(cpu.status.contains(CPUStatus::Overflow));
+        
+        cpu.load_and_run(vec![
+            0xa9, 0b1000_0000,
+            0x89, 0b0010_0000,
+            0x0,
+        ]);
+
+        assert!(cpu.status.contains(CPUStatus::Zero));
+        assert!(!cpu.status.contains(CPUStatus::Negative));
+        assert!(!cpu.status.contains(CPUStatus::Overflow));
     }
 
     #[test]
     fn test_bmi() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![ // branch
+            0xa9, 0b1000_0000,
+            0x30, 0x03,
+            0xa9, 0x02,
+            0x0,
+            0xa9, 0x03,
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x03);
+
+        
+        cpu.load_and_run(vec![ // no branch
+            0xa9, 1,
+            0x30, 0x03,
+            0xa9, 0x02,
+            0x0,
+            0xa9, 0x03,
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x02);
 
     }
 
     #[test]
     fn test_bne() {
+        
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![ // branch
+            0xa9, 0b1000_0000,
+            0xD0, 0x03,
+            0xa9, 0x02,
+            0x0,
+            0xa9, 0x03,
+            0x0,
+        ]);
 
+        assert_eq!(cpu.register_a, 0x03);
+
+        
+        cpu.load_and_run(vec![ // no branch
+            0xa9, 0,
+            0xD0, 0x03,
+            0xa9, 0x02,
+            0x0,
+            0xa9, 0x03,
+            0x0,
+        ]);
+
+        assert_eq!(cpu.register_a, 0x02);
     }
 
 }

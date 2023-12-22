@@ -146,6 +146,9 @@ impl CPU {
                 OpCodeName::BCC => self.bcc(entry),
                 OpCodeName::BCS => self.bcs(entry),
                 OpCodeName::BEQ => self.beq(entry),
+                OpCodeName::BIT => self.bit(entry),
+                OpCodeName::BMI => self.bmi(entry),
+                OpCodeName::BNE => self.bne(entry),
                 OpCodeName::BRK => break, // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("ඞ AMOGUS JUMPSCARE ඞ")
@@ -313,11 +316,17 @@ impl CPU {
         if data == 0 {
             self.status.insert(CPUStatus::Zero);   
         }
+
         if m & 0b1000_0000 > 0 {
             self.status.insert(CPUStatus::Negative);
+        } else {
+            self.status.remove(CPUStatus::Negative);
         }
+
         if m & 0b0100_0000 > 0 {
             self.status.insert(CPUStatus::Overflow);
+        } else {
+            self.status.remove(CPUStatus::Overflow);
         }
     }
 
