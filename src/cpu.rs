@@ -348,6 +348,8 @@ impl CPU {
         }
     }
 
+    // read :) again
+    // https://web.archive.org/web/20200129081101/http://users.telenet.be:80/kim1-6502/6502/proman.html#911
     fn brk(&mut self) {
 
     }
