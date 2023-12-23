@@ -17,5 +17,7 @@ pub enum OpCodeName {
     PLA, PLP, RTI, ADC, AND,
     ASL, BCC, BCS, BEQ, BIT,
     BMI, BNE, BPL, BVC, BVS,
+    CLC, CLD, CLI, CLV, CMP,
+    CPX,
 }
 

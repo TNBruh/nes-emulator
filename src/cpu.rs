@@ -149,7 +149,11 @@ impl CPU {
                 OpCodeName::BIT => self.bit(entry),
                 OpCodeName::BMI => self.bmi(entry),
                 OpCodeName::BNE => self.bne(entry),
-                OpCodeName::BRK => break, // todo: update this
+                OpCodeName::BRK => {
+                    // might implement this last
+                    self.brk();
+                    break;
+                } // todo: update this
                 // if there's no warning about unreachable pattern, then you know why
                 _ => todo!("ඞ AMOGUS JUMPSCARE ඞ")
             }
@@ -364,6 +368,34 @@ impl CPU {
         if self.status.contains(CPUStatus::Overflow) {
             self.branch(op, self.mem_read(self.program_counter) as i8)
         }
+    }
+
+    fn clc(&mut self) {
+        self.status.remove(CPUStatus::Carry)
+    }
+    
+    fn cld(&mut self) {
+        self.status.remove(CPUStatus::Decimal)
+    }
+
+    fn cli(&mut self) {
+        self.status.remove(CPUStatus::InterruptDisable)
+    }
+
+    fn clv(&mut self) {
+        self.status.remove(CPUStatus::Overflow)
+    }
+
+    fn cmp(&mut self, op: &OpCode) {
+        // let res = self.register_a.wrapping_sub(
+        //     self.mem_read(self.get_operand_address(&op.mode))
+        // ) as i8;
+
+
+    }
+
+    fn cpx(&mut self, op: &OpCode) {
+        
     }
 
     // stack

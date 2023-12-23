@@ -81,6 +81,9 @@ lazy_static!{
         OpCode { byte:0x24, name:OpCodeName::BIT, len:2, cycles:3, mode:AddressingMode::ZeroPage },
         OpCode { byte:0x30, name:OpCodeName::BMI, len:2, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0xD0, name:OpCodeName::BNE, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x10, name:OpCodeName::BPL, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x50, name:OpCodeName::BVC, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x70, name:OpCodeName::BVS, len:2, cycles:2, mode:AddressingMode::NonAddressing }
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
@@ -98,8 +101,9 @@ fn main() {
     // println!("{:X} {:X}", le_num[0], le_num[1]);
     // println!("{}", u16::from_be_bytes([0x01, 0x00]));
     
-    // let num: i8 = -1;
+    let num: i8 = -1;
     // let new_num: u16 = (num as u16) + 1;
+    println!("{:X}", num as u16);
     // println!("{:X} {:#}", new_num, new_num);
 }
 
