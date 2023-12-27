@@ -101,9 +101,9 @@ fn main() {
     // println!("{:X} {:X}", le_num[0], le_num[1]);
     // println!("{}", u16::from_be_bytes([0x01, 0x00]));
     
-    let num: i8 = -1;
+    let num: u8 = 0b1000_0000;
     // let new_num: u16 = (num as u16) + 1;
-    println!("{:X}", num as u16);
+    println!("{:X}: {:#018b}", num as i16, num as i16);
     // println!("{:X} {:#}", new_num, new_num);
 }
 

@@ -387,15 +387,33 @@ impl CPU {
     }
 
     fn cmp(&mut self, op: &OpCode) {
-        // let res = self.register_a.wrapping_sub(
-        //     self.mem_read(self.get_operand_address(&op.mode))
-        // ) as i8;
+        let res = (self.register_a as i16).wrapping_sub(
+            self.mem_read(self.get_operand_address(&op.mode)) as i16
+        );
+        if res == 0 {
+            self.status.set(CPUStatus::Zero, true);
+        }
+        if res & 0b0000_0000_1000_0000 != 0 {
+            self.status.set(CPUStatus::Negative, true);
+        } else {
+            self.status.set(CPUStatus::Carry, true);
+        }
 
 
     }
 
     fn cpx(&mut self, op: &OpCode) {
-        
+        let res = (self.register_x as i16).wrapping_sub(
+            self.mem_read(self.get_operand_address(&op.mode)) as i16
+        );
+        if res == 0 {
+            self.status.set(CPUStatus::Zero, true);
+        }
+        if res & 0b0000_0000_1000_0000 != 0 {
+            self.status.set(CPUStatus::Negative, true);
+        } else {
+            self.status.set(CPUStatus::Carry, true);
+        }
     }
 
     // stack
