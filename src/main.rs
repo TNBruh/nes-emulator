@@ -83,7 +83,22 @@ lazy_static!{
         OpCode { byte:0xD0, name:OpCodeName::BNE, len:2, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0x10, name:OpCodeName::BPL, len:2, cycles:2, mode:AddressingMode::NonAddressing },
         OpCode { byte:0x50, name:OpCodeName::BVC, len:2, cycles:2, mode:AddressingMode::NonAddressing },
-        OpCode { byte:0x70, name:OpCodeName::BVS, len:2, cycles:2, mode:AddressingMode::NonAddressing }
+        OpCode { byte:0x70, name:OpCodeName::BVS, len:2, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x18, name:OpCodeName::CLC, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xD8, name:OpCodeName::CLD, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0x58, name:OpCodeName::CLI, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xB8, name:OpCodeName::CLV, len:1, cycles:2, mode:AddressingMode::NonAddressing },
+        OpCode { byte:0xC9, name:OpCodeName::CMP, len:2, cycles:2, mode:AddressingMode::Immediate },
+        OpCode { byte:0xC5, name:OpCodeName::CMP, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0xD5, name:OpCodeName::CMP, len:2, cycles:4, mode:AddressingMode::ZeroPage_X },
+        OpCode { byte:0xCD, name:OpCodeName::CMP, len:3, cycles:4, mode:AddressingMode::Absolute },
+        OpCode { byte:0xDD, name:OpCodeName::CMP, len:3, cycles:4, mode:AddressingMode::Absolute_X },
+        OpCode { byte:0xD9, name:OpCodeName::CMP, len:3, cycles:4, mode:AddressingMode::Absolute_Y },
+        OpCode { byte:0xC1, name:OpCodeName::CMP, len:2, cycles:6, mode:AddressingMode::Indirect_X },
+        OpCode { byte:0xD1, name:OpCodeName::CMP, len:2, cycles:5, mode:AddressingMode::Indirect_Y },
+        OpCode { byte:0xE0, name:OpCodeName::CPX, len:2, cycles:2, mode:AddressingMode::Immediate },
+        OpCode { byte:0xE4, name:OpCodeName::CPX, len:2, cycles:3, mode:AddressingMode::ZeroPage },
+        OpCode { byte:0xEC, name:OpCodeName::CPX, len:3, cycles:4, mode:AddressingMode::Absolute }
     ];
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
         let mut map: HashMap<u8, &OpCode> = HashMap::new();
